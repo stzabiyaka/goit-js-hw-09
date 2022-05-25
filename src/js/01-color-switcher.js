@@ -1,5 +1,5 @@
 
-import getRandomHexColor from "./random-hex-color";
+import getRandomHexColor from "./js-modules/random-hex-color";
 
 const refs = {
     startBtn: document.querySelector('[data-start]'),
