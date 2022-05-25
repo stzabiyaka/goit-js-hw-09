@@ -4,29 +4,41 @@ import getRandomHexColor from "./js-modules/random-hex-color";
 const refs = {
     startBtn: document.querySelector('[data-start]'),
     stopBtn: document.querySelector('[data-stop]'),
-    body: document.body
+    target: document.body
 }
 
-let timerId = null;
+class ColorSwitcher {
+    constructor ({onTick}, refs) {
+        this.onTick = onTick;
+        this.timerId = null;
+        this.startBtn = refs.startBtn;
+        this.stopBtn = refs.stopBtn;
+        this.target = refs.target;
 
-onStopBtnClick();
+        this.initTimer();
+        this.startBtn.addEventListener('click', this.startTimer.bind(this));
+        this.stopBtn.addEventListener('click', this.stopTimer.bind(this));
+    }
+
+    initTimer () {
+        this.stopBtn.disabled = true;
+        this.startBtn.disabled = false;   
+    }
+
+    startTimer () {
+        this.timerId = setInterval(this.onTick, 1000);
+        this.startBtn.disabled = true;
+        this.stopBtn.disabled = false;
+    }
+
+    stopTimer () {
+        clearInterval(this.timerId);
+        this.initTimer();
+    }
+}
+
+const colorSwitcher = new ColorSwitcher({onTick: changeBodyColor}, refs);
 
 function changeBodyColor () {
-    refs.body.style.backgroundColor = getRandomHexColor();
-}
-
-function onStartBtnClick () {
-    timerId = setInterval(changeBodyColor, 1000);
-    refs.startBtn.disabled = true;
-    refs.stopBtn.disabled = false;
-    refs.stopBtn.addEventListener('click', onStopBtnClick);
-    refs.stopBtn.removeEventListener('click', onStartBtnClick);
-}
-    
-function onStopBtnClick () {
-    clearInterval(timerId);
-    refs.stopBtn.disabled = true;
-    refs. startBtn.disabled = false;
-    refs.startBtn.addEventListener('click', onStartBtnClick);
-    refs.startBtn.removeEventListener('click', onStopBtnClick);
+    refs.target.style.backgroundColor = getRandomHexColor();
 }
