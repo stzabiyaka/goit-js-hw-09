@@ -6,10 +6,10 @@ const formRef = document.querySelector('.form');
 formRef.addEventListener('submit', onFormSubmit);
 
 function createPromise(position, delay) {
+  const shouldResolve = Math.random() > 0.3;
+  const result = {position, delay};
+  
   return new Promise ((resolve, reject) => {
-    const shouldResolve = Math.random() > 0.3;
-    const result = {position, delay}
-
     setTimeout (() => {
       if (shouldResolve) {
       resolve(result);
@@ -25,6 +25,11 @@ function onFormSubmit (evt) {
   const step = Number(formRef.elements.step.value);
   const amount = Number(formRef.elements.amount.value);
   evt.preventDefault();
+
+  if (firstDelay === NaN || step === NaN || amount === NaN) {
+    Notify.warning('Please, fill in all the fields with numders');
+    return;
+  }
 
   for (let i = 0; i < amount; i += 1) {
     createPromise(i, (firstDelay + (i * step)))

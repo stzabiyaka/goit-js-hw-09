@@ -1,51 +1,41 @@
 
 import getRandomHexColor from "./js-modules/random-hex-color";
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import "notiflix/dist/notiflix-3.2.5.min.css"
+import Timer from "./js-classes/timer-class";
 
 const refs = {
     startBtn: document.querySelector('[data-start]'),
     stopBtn: document.querySelector('[data-stop]'),
     target: document.body,
-    notification: Notify,
 }
 
-class Timer {
-    constructor ({onTick}, references) {
-        this.onTick = onTick;
-        this.timerId = null;
-        this.isTimerActive = false;
-        this.startBtn = references.startBtn;
-        this.stopBtn = references.stopBtn;
-        this.notification = references.notification;
-        
-        this.setBtnsState();
-        this.startBtn.addEventListener('click', this.startTimer.bind(this));
-        this.stopBtn.addEventListener('click', this.stopTimer.bind(this));
-    }
+const timer = new Timer({onTick: changeTargetColor});
 
-    startTimer () {
-        this.isTimerActive = true;
-        this.setBtnsState();
-        this.timerId = setInterval(this.onTick, 1000);
-        this.notification.info('Color switching started');
-    }
+let isTimerActive = false;
 
-    stopTimer () {
-        this.isTimerActive = false;
-        this.setBtnsState();
-        clearInterval(this.timerId);
-        this.notification.success('Color switching stopped');
-    }
+setBtnsState();
+refs.startBtn.addEventListener('click', onStartBtnClick);
+refs.stopBtn.addEventListener('click', onStopBtnClick);
 
-    setBtnsState () {
-        this.startBtn.disabled = this.isTimerActive; 
-        this.stopBtn.disabled = !this.isTimerActive;
-    }
+
+function onStartBtnClick () {
+    isTimerActive = true;
+
+    setBtnsState(isTimerActive);
+    timer.startTimer();
 }
 
-const timer = new Timer({onTick: changeBodyColor}, refs);
+function onStopBtnClick () {
+    isTimerActive = false;
 
-function changeBodyColor () {
+    setBtnsState(isTimerActive);
+    timer.stopTimer();
+}
+
+function setBtnsState (isActive = false) {
+    refs.startBtn.disabled = isActive; 
+    refs.stopBtn.disabled = !isActive;
+}
+
+function changeTargetColor () {
     refs.target.style.backgroundColor = getRandomHexColor();
 }
