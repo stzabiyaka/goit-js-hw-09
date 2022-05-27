@@ -7,41 +7,29 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import "notiflix/dist/notiflix-3.2.5.min.css"
 
 /* classes */
-class CountdownTimer {
-    constructor ({onTick},refs) {
+class Timer {
+    constructor ({onTick},references) {
         this.timerId = null;
-        this.dateInput = refs.dateInput;
-        this.startBtn = refs.startBtn;
-        this.notification = refs.notification;
-        this.onTick = onTick;
+        this.dateInput = references.dateInput;
+        this.startBtn = references.startBtn;
+        this.notification = references.notification;
+        this.onTick = onTick.bind(this);
 
-        refs.startBtn.disabled = true;
+        this.startBtn.disabled = true;
         this.startBtn.addEventListener('click', this.startTimer.bind(this));
     }
     
 
     startTimer () {
         this.notification.info('Countdown started');
-        this.updateTimerValues(); 
-        this.timerId = setInterval(this.updateTimerValues.bind(this), 1000);
+        this.onTick; 
+        this.timerId = setInterval(this.onTick, 1000);
         this.startBtn.disabled = true;
     }
 
     stopTimer () {
         clearInterval(this.timerId);
             this.notification.success('Countdown finished');
-    }
-
-    updateTimerValues () {
-        const currentTime = Date.now();
-        const deltaTime = selectedDate - currentTime;
-    
-        if (deltaTime <= 0){
-            this.stopTimer();
-            return;
-        }
-    
-        this.onTick(convertMs(deltaTime));
     }
 }
 
@@ -55,7 +43,6 @@ const refs = {
     hoursValue: document.querySelector('[data-hours]'),
     daysValue: document.querySelector('[data-days]'),
     notification: Notify,
-    
 }
 const flatpickrOptions = {
     enableTime: true,
@@ -73,7 +60,7 @@ const flatpicrInstance = flatpickr(refs.dateInput, flatpickrOptions);
 
 /* script initialisation */
 
-const countdownTimer = new CountdownTimer({onTick: updateTimerDisplay}, refs);
+const countdownTimer = new Timer({onTick: updateCountdownDisplay}, refs);
 
 /*functions */
 function checkPickedDate () {
@@ -88,12 +75,24 @@ function checkPickedDate () {
     refs.startBtn.disabled = false;   
 }
 
-function updateTimerDisplay (timerValues) {
+function updateCountdownDisplay () {
+    const currentTime = Date.now();
+    const deltaTime = selectedDate - currentTime;
+
+    if (deltaTime <= 0){
+        this.stopTimer();
+        return;
+    }
+
+    updateCountdownValues(convertMs(deltaTime));
+}
+
+function updateCountdownValues (countdownValues) {
     
-        refs.secondsValue.textContent = addLeadingZero(timerValues.seconds);
-        refs.minutesValue.textContent = addLeadingZero(timerValues.minutes);
-        refs.hoursValue.textContent = addLeadingZero(timerValues.hours);
-        refs.daysValue.textContent = addLeadingZero(timerValues.days);
+    refs.secondsValue.textContent = addLeadingZero(countdownValues.seconds);
+    refs.minutesValue.textContent = addLeadingZero(countdownValues.minutes);
+    refs.hoursValue.textContent = addLeadingZero(countdownValues.hours);
+    refs.daysValue.textContent = addLeadingZero(countdownValues.days);
 }
 
 
